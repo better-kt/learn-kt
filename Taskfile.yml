@@ -1,0 +1,93 @@
+version: "3"
+
+includes:
+  app:
+    taskfile: packages/app/
+    dir: packages/app/
+    optional: true
+
+  v2:
+    taskfile: packages/v2/
+    dir: packages/v2/
+    optional: true
+
+  pkg:
+    aliases: [ "packages" ]
+    taskfile: packages/
+    dir: packages/
+    optional: true
+
+
+
+
+################################################################################################
+
+#
+# global vars: https://taskfile.dev/#/usage?id=variables
+#
+vars:
+  VAR1: "some-var"
+
+# global env:
+env:
+  ENV1: testing
+
+# env file:
+dotenv:
+  - .env
+
+################################################################################################
+
+tasks:
+  init:
+    cmds:
+      - task: init:env
+
+  init:env:
+    cmds:
+      - cp .env.local .env
+
+  ##################################################################################################
+
+
+  new:
+    cmds:
+      - echo new ${NEW_PROJECT_DIR}${NEW_PROJECT_NAME}
+      - poetry new ${NEW_PROJECT_DIR}${NEW_PROJECT_NAME} --src
+    dir: packages/
+
+
+  ##################################################################################################
+
+  q:
+    cmds:
+      - task: quick
+      - task: push
+
+  quick:
+    cmds:
+      - task: c
+      - task: pull
+  #      - task: push
+
+  c:
+    cmds:
+      - task: commit
+      - task: commit
+
+  commit:
+    cmds:
+      - git add .
+      - git commit -m "update"
+    ignore_error: true
+
+  pull:
+    cmds:
+      - git config pull.rebase false
+      - git pull origin main
+
+  push:
+    cmds:
+      - git pull origin main
+      - git push origin main --tags
+      - repo_url=`git remote -v | grep push | awk -F ":" '{print $2}' | awk -F ".git" '{print "https://github.com/"$1}'`; open $repo_url
